@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty List - CSRR Faculty Tracker{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="fas fa-users"></i> CSRR Faculty Affiliates
+        </h4>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">
+            Complete list of {{ faculty_names|length }} faculty affiliates tracked by the system.
+        </p>
+        
+        <div class="row">
+            {% for name in faculty_names %}
+            <div class="col-md-4 mb-2">
+                <div class="card">
+                    <div class="card-body py-2">
+                        <small class="text-muted">{{ loop.index }}</small>
+                        <h6 class="mb-0">{{ name }}</h6>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

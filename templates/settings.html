@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - CSRR Faculty Tracker{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="fas fa-cog"></i> Settings
+        </h4>
+    </div>
+    <div class="card-body">
+        {% if current_user.is_admin %}
+        <form method="POST" action="{{ url_for('update_settings') }}">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Search Configuration</h5>
+                    <div class="mb-3">
+                        <label for="days_back" class="form-label">Days Back to Search</label>
+                        <input type="number" class="form-control" id="days_back" name="days_back" 
+                               value="{{ config.search.days_back }}" min="1" max="365">
+                        <div class="form-text">Number of days to look back for publications</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="max_results" class="form-label">Max Results per Faculty</label>
+                        <input type="number" class="form-control" id="max_results" name="max_results" 
+                               value="{{ config.search.max_results_per_faculty }}" min="1" max="20">
+                        <div class="form-text">Maximum number of results to collect per faculty member</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="delay" class="form-label">Delay Between Searches (seconds)</label>
+                        <input type="number" class="form-control" id="delay" name="delay" 
+                               value="{{ config.search.delay_between_searches }}" min="0.5" max="10" step="0.5">
+                        <div class="form-text">Delay to prevent rate limiting</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5>Email Configuration</h5>
+                    <div class="mb-3">
+                        <label for="smtp_server" class="form-label">SMTP Server</label>
+                        <input type="text" class="form-control" id="smtp_server" 
+                               value="{{ config.email.smtp_server }}" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="smtp_port" class="form-label">SMTP Port</label>
+                        <input type="number" class="form-control" id="smtp_port" 
+                               value="{{ config.email.smtp_port }}" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="sender_email" class="form-label">Sender Email</label>
+                        <input type="email" class="form-control" id="sender_email" 
+                               value="{{ config.email.sender_email }}" readonly>
+                        <div class="form-text">Update email configuration in config.json</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Save Settings
+            </button>
+        </form>
+        {% else %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            You need administrator privileges to modify settings.
+        </div>
+        {% endif %}
+        
+        <hr>
+        
+        <h5>Current Configuration</h5>
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <tr>
+                    <td><strong>Search Days Back</strong></td>
+                    <td>{{ config.search.days_back }} days</td>
+                </tr>
+                <tr>
+                    <td><strong>Max Results per Faculty</strong></td>
+                    <td>{{ config.search.max_results_per_faculty }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Search Delay</strong></td>
+                    <td>{{ config.search.delay_between_searches }} seconds</td>
+                </tr>
+                <tr>
+                    <td><strong>Reports Folder</strong></td>
+                    <td>{{ config.output.reports_folder }}</td>
+                </tr>
+                <tr>
+                    <td><strong>SMTP Server</strong></td>
+                    <td>{{ config.email.smtp_server }}:{{ config.email.smtp_port }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

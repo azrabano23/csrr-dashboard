@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-stats">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h3>{{ stats.faculty_count }}</h3>
+                <p>Faculty Members</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h3>{{ stats.total_runs }}</h3>
+                <p>Total Searches</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h3>{{ stats.successful_runs }}</h3>
+                <p>Successful Runs</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h3>{{ stats.subscriber_count }}</h3>
+                <p>Email Subscribers</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-search"></i> Faculty Publication Search
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Automatically search for recent op-eds, interviews, and publications by CSRR faculty affiliates.
+                    The search covers the last 30 days and generates a comprehensive Excel report.
+                </p>
+                {% if current_user.is_authenticated %}
+                <form method="POST" action="{{ url_for('run_search') }}">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-play"></i> Start New Search
+                    </button>
+                </form>
+                {% else %}
+                <p class="text-muted">
+                    <i class="fas fa-info-circle"></i> 
+                    Please <a href="{{ url_for('login') }}">log in</a> to start a search.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history"></i> Recent Search Runs
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_runs %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Started</th>
+                                <th>Status</th>
+                                <th>Results</th>
+                                <th>Duration</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for run in recent_runs %}
+                            <tr>
+                                <td>{{ run.started_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% if run.status == 'completed' %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% elif run.status == 'running' %}
+                                        <span class="badge bg-primary">Running</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Failed</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ run.results_count or 0 }}</td>
+                                <td>
+                                    {% if run.completed_at %}
+                                        {{ ((run.completed_at - run.started_at).total_seconds() / 60) | round(1) }} min
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if run.status == 'completed' and run.report_path %}
+                                        <a href="{{ url_for('download_report', run_id=run.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download"></i> Download
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No searches have been run yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-envelope"></i> Email Notifications
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Subscribe to receive automated monthly reports via email on the 30th of each month.
+                </p>
+                <form method="POST" action="{{ url_for('subscribe') }}">
+                    <div class="input-group">
+                        <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="fas fa-bell"></i> Subscribe
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> System Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><strong>Faculty Count:</strong> {{ stats.faculty_count }}</li>
+                    <li><strong>Search Scope:</strong> Last 30 days</li>
+                    <li><strong>Content Types:</strong> Op-eds, Interviews, TV appearances</li>
+                    <li><strong>Output Format:</strong> Excel (.xlsx)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-question-circle"></i> How It Works
+                </h5>
+            </div>
+            <div class="card-body">
+                <ol class="small">
+                    <li>Click "Start New Search" to begin</li>
+                    <li>System searches for each faculty member</li>
+                    <li>Results are compiled into an Excel report</li>
+                    <li>Report is automatically emailed to subscribers</li>
+                    <li>Download reports from the dashboard</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

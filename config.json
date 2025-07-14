@@ -1,0 +1,18 @@
+{
+    "email": {
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": 587,
+        "sender_email": "",
+        "sender_password": "",
+        "recipient_emails": []
+    },
+    "search": {
+        "days_back": 30,
+        "max_results_per_faculty": 5,
+        "delay_between_searches": 2
+    },
+    "output": {
+        "reports_folder": "/Users/azrabano/CSRR_Reports",
+        "filename_prefix": "CSRR_Faculty_Publications"
+    }
+}
